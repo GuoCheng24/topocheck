@@ -85,7 +85,7 @@ tc.prevalence_check(y, scores, prevalence=1e-3)     # does a balanced AUC surviv
 
 ```mermaid
 flowchart TD
-    A["A reported improvement in a<br/>connectivity or topology metric"] --> B{"Where does the<br/>improvement come from?"}
+    A["A reported improvement in a connectivity<br/>or topology metric"] --> B{"Where does the<br/>improvement come from?"}
 
     B -->|"post-processing,<br/>decoding or repair"| C["decompose_errors<br/><i>is any of the error repairable?</i>"]
     C -->|"repairable share is small"| C1["the method is capped there<br/>whatever it does"]
