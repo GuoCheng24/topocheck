@@ -34,6 +34,9 @@ pip install git+https://github.com/GuoCheng24/topocheck
 
 Requires numpy, scipy and scikit-image. Not yet on PyPI.
 
+Tests cover 99% of the package and CI enforces a 95% floor across Python 3.9,
+3.11 and 3.12, together with linting and a regeneration of both figures.
+
 ## Thirty seconds
 
 ```bash
@@ -67,6 +70,44 @@ tc.random_repair_baseline(pred, repaired, units)    # does your repair beat a ra
 tc.tolerance_sweep(pred, units)                     # does the conclusion survive the conventions?
 tc.annotation_floor(gt_observer1, gt_observer2)     # is the gain inside human disagreement?
 tc.prevalence_check(y, scores, prevalence=1e-3)     # does a balanced AUC survive deployment?
+```
+
+## Who this is for
+
+| If you | this gives you |
+|---|---|
+| **develop topology-aware losses or decoders** | the ceiling on what your method could buy on a given dataset, before you train anything, and a floor it has to clear |
+| **review or referee** such papers | five specific questions with numeric answers, each of which a paper can be asked to report |
+| **curate or run a benchmark** | the inter-annotator floor for your own ground truth, which decides whether the benchmark still has room to measure anything |
+| **just inherited a segmentation pipeline** | a decomposition of where its connectivity errors actually come from, which is usually not where people assume |
+
+## Which check applies to what
+
+```mermaid
+flowchart TD
+    A["A reported improvement in a<br/>connectivity or topology metric"] --> B{"Where does the<br/>improvement come from?"}
+
+    B -->|"post-processing,<br/>decoding or repair"| C["decompose_errors<br/><i>is any of the error repairable?</i>"]
+    C -->|"repairable share is small"| C1["the method is capped there<br/>whatever it does"]
+    C -->|"repairable share is large"| D["random_repair_baseline<br/><i>beat a random repair of<br/>the same size, at matched<br/>false-merge cost?</i>"]
+    D -->|no| D1["the gain is from connecting more,<br/>not from connecting correctly"]
+
+    B -->|"a loss, an architecture<br/>or a training change"| E["tolerance_sweep<br/><i>does the conclusion survive<br/>the endpoint convention?</i>"]
+    E -->|"conclusion flips"| E1["the metric cannot carry<br/>a claim about <i>why</i>"]
+
+    D --> F["annotation_floor<br/><i>is the gain larger than the<br/>disagreement between two<br/>human annotators?</i>"]
+    E --> F
+    F -->|no| F1["the benchmark has no<br/>room left to measure this"]
+
+    F --> G{"Is any part of the evidence<br/>an AUC on a balanced sample?"}
+    G -->|yes| H["prevalence_check<br/><i>what precision does that<br/>become at the real class ratio?</i>"]
+    G -->|no| I["the improvement survives<br/>the checks that apply"]
+    H --> I
+
+    classDef warn fill:#fdece3,stroke:#D55E00,color:#7a3a10;
+    classDef ok fill:#e4f5ee,stroke:#009E73,color:#0b4f3a;
+    class C1,D1,E1,F1 warn;
+    class I ok;
 ```
 
 ## The five checks, and why each one exists

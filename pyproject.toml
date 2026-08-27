@@ -20,7 +20,7 @@ classifiers = [
 dependencies = ["numpy>=1.21", "scipy>=1.7", "scikit-image>=0.19"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7", "matplotlib>=3.5", "pillow>=9"]
+dev = ["pytest>=7", "pytest-cov>=4", "ruff>=0.5", "matplotlib>=3.5", "pillow>=9"]
 
 [project.urls]
 Homepage = "https://github.com/GuoCheng24/topocheck"
@@ -28,3 +28,20 @@ Issues = "https://github.com/GuoCheng24/topocheck/issues"
 
 [tool.setuptools.packages.find]
 include = ["topocheck*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "C4", "UP", "RUF", "BLE", "SIM"]
+# C408: dict(a=1) reads better than {"a": 1} for the keyword-shaped return values
+# used throughout this package, where the keys are the documented field names.
+ignore = ["C408", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

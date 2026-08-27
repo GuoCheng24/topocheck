@@ -11,7 +11,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install --upgrade pip && pip install -e ".[dev]"
-      - run: pytest -q
+      - run: python -m pip install --upgrade pip && pip install -e ".[dev]" ruff pytest-cov
+      - name: lint
+        run: ruff check topocheck tests examples
+      - name: tests and coverage floor
+        run: pytest -q --cov=topocheck --cov-report=term-missing --cov-fail-under=95
       - name: figure regenerates
         run: python examples/make_hero_figure.py && python examples/why_random_wins.py

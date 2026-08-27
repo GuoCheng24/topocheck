@@ -6,12 +6,14 @@ reproduced verbatim here so the figure can be audited against them.  Sources:
 (a) TopCoW, 50 held-out volumes, strict endpoint criterion.
 (b) HRF (45 fundus images) and TopCoW, plain U-Net baseline, threshold 0.5.
 (c) same two datasets, endpoint tolerance swept over 0-3 voxels.
-(d) STARE, 20 fundus images with two expert annotators; the model is a U-Net
+(d) STARE, 20 fundus images with two expert annotators
+the model is a U-Net
     cross-validated on the same 20 images against annotator "ah".
 """
 from __future__ import annotations
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -57,7 +59,8 @@ def main(out: str = "docs/hero.png") -> str:
     y = np.arange(len(A_LABELS))
     cols = [RED if r else (GREY if g == 0 else BLUE) for r, g in zip(A_ISRAND, A_GAIN)]
     a.barh(y, A_GAIN, color=cols, height=0.62)
-    a.set_yticks(y); a.set_yticklabels(A_LABELS)
+    a.set_yticks(y)
+    a.set_yticklabels(A_LABELS)
     a.invert_yaxis()
     a.set_xlabel("break rate reduction (%)")
     a.set_xlim(0, 37)
@@ -74,7 +77,8 @@ def main(out: str = "docs/hero.png") -> str:
     miss = [br - f for br, f in zip(B_BREAK, frag)]
     b.bar(x, miss, color=GREY, width=0.5, label="undetected structure (unrepairable)")
     b.bar(x, frag, bottom=miss, color=GREEN, width=0.5, label="fragmented (repairable)")
-    b.set_xticks(x); b.set_xticklabels(B_SETS)
+    b.set_xticks(x)
+    b.set_xticklabels(B_SETS)
     b.set_ylabel("break rate")
     b.set_ylim(0, 0.68)
     b.set_xlim(-0.62, 2.05)
@@ -121,8 +125,10 @@ def main(out: str = "docs/hero.png") -> str:
                fontsize=8, color=BLUE, ha="left", va="center",
                arrowprops=dict(arrowstyle="-", color=BLUE, lw=0.8))
     d.text(0.487, 0.46, "0.008 apart", fontsize=8, color="#444444", ha="left", va="center")
-    d.set_xlim(0.135, 0.66); d.set_ylim(0.02, 1.52)
-    d.set_yticks([]); d.spines["left"].set_visible(False)
+    d.set_xlim(0.135, 0.66)
+    d.set_ylim(0.02, 1.52)
+    d.set_yticks([])
+    d.spines["left"].set_visible(False)
     d.set_xlabel("break rate on STARE")
     d.set_title("d   the model lands inside human disagreement",
                 loc="left", fontsize=9.5, fontweight="bold", pad=8)

@@ -24,14 +24,15 @@ from scipy import ndimage
 
 from .units import full_structure
 
-__all__ = ["label_with_tolerance", "break_rate", "false_merge_rate"]
+__all__ = ["break_rate", "false_merge_rate", "label_with_tolerance"]
 
 
 def label_with_tolerance(pred: np.ndarray, tolerance: int = 0) -> np.ndarray:
     """Component labels of ``pred``, optionally reachable from ``tolerance`` away.
 
     Voxels within ``tolerance`` of the prediction inherit the label of their
-    nearest predicted voxel; everything else stays 0.
+    nearest predicted voxel
+    everything else stays 0.
     """
     pred = np.asarray(pred).astype(bool)
     st = full_structure(pred.ndim)
@@ -79,7 +80,8 @@ def false_merge_rate(pred: np.ndarray, gt: np.ndarray, min_size: int = 50) -> di
     """Fraction of ground-truth component pairs that the prediction fuses.
 
     This is the other half of the picture.  Break rate alone can always be
-    improved by connecting more, so it says nothing on its own; what separates a
+    improved by connecting more, so it says nothing on its own
+    what separates a
     repair from a random one is what it costs here.
 
     Ground-truth components smaller than ``min_size`` are ignored: they are

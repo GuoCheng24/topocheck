@@ -12,11 +12,11 @@ from .metrics import break_rate, false_merge_rate
 from .units import full_structure
 
 __all__ = [
-    "random_repair_baseline",
-    "decompose_errors",
-    "tolerance_sweep",
     "annotation_floor",
+    "decompose_errors",
     "prevalence_check",
+    "random_repair_baseline",
+    "tolerance_sweep",
 ]
 
 
@@ -56,7 +56,8 @@ def random_repair_baseline(pred, repaired, units, gt=None, n_repeats: int = 20,
 
     Pass ``gt`` to get the second axis.  Break rate on its own can always be
     improved by connecting more, so the comparison that means anything is
-    *break at matched false-merge cost*; without ``gt`` this function can only
+    *break at matched false-merge cost*
+    without ``gt`` this function can only
     report half of it.
 
     Parameters

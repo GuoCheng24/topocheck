@@ -6,7 +6,8 @@ of those datasets.  It follows from what the break rate measures.
 
 A unit counts as repaired once its two endpoints share a connected component.
 Any linking of components therefore repairs units in bulk, whether or not the
-link corresponds to a real vessel.  Break rate cannot see the difference; only
+link corresponds to a real vessel.  Break rate cannot see the difference
+only
 the false merge rate can.
 
 This script builds synthetic vasculature, fragments it, and repairs it three
@@ -68,9 +69,9 @@ def repair(pred, gt, strategy: str, rng) -> np.ndarray:
     if n < 2:
         return pred.copy()
     labg, _ = ndimage.label(gt, structure=st)
-    sizes = np.bincount(labp.ravel()); sizes[0] = 0
+    sizes = np.bincount(labp.ravel())
+    sizes[0] = 0
     order = [c for c in np.argsort(-sizes) if c > 0]
-    trunk = order[0]
     pts = {c: np.argwhere(labp == c) for c in order}
     # which GT tree each predicted component belongs to
     tree = {c: int(np.bincount(labg[labp == c]).argmax()) for c in order}
@@ -140,7 +141,8 @@ def plot(res, out: str = "docs/random_baseline.png") -> str:
                 arrowprops=dict(arrowstyle="->", color="#D55E00", lw=0.9))
     ax.set_xlabel("false merge rate  (lower is better)")
     ax.set_ylabel("break rate reduction (%)  (higher is better)")
-    ax.set_xlim(-0.08, 1.14); ax.set_ylim(28, 100)
+    ax.set_xlim(-0.08, 1.14)
+    ax.set_ylim(28, 100)
     ax.legend(frameon=False, loc="lower right", title="repair strategy",
               title_fontsize=8.5, handlelength=1.4, borderaxespad=0.8)
     fig.tight_layout()
@@ -171,5 +173,5 @@ if __name__ == "__main__":
     try:
         out = plot(res)
         print(f"\nwrote {out}")
-    except Exception as exc:            # matplotlib is an optional dev dependency
+    except Exception as exc:  # noqa: BLE001 - matplotlib is an optional dev dependency
         print(f"\n(figure skipped: {exc})")

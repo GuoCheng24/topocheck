@@ -15,7 +15,7 @@ import numpy as np
 from scipy import ndimage
 from skimage.morphology import skeletonize
 
-__all__ = ["build_units", "Unit", "full_structure"]
+__all__ = ["Unit", "build_units", "full_structure"]
 
 
 class Unit:

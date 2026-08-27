@@ -1,43 +1,65 @@
 import numpy as np
 import pytest
-from topocheck import (build_units, decompose_errors, tolerance_sweep,
-                       annotation_floor, prevalence_check, random_repair_baseline)
+
+from topocheck import (
+    annotation_floor,
+    build_units,
+    decompose_errors,
+    prevalence_check,
+    random_repair_baseline,
+    tolerance_sweep,
+)
+
 
 def scene():
-    g = np.zeros((60, 80), bool); g[30, 5:75] = True; g[10:50, 40] = True
+    g = np.zeros((60, 80), bool)
+    g[30, 5:75] = True
+    g[10:50, 40] = True
     return g, build_units(g)
 
 
 def test_decompose_reports_repairable_budget():
-    g, u = scene(); p = g.copy(); p[30, 20] = False; p[30, 72:] = False
+    g, u = scene()
+    p = g.copy()
+    p[30, 20] = False
+    p[30, 72:] = False
     r = decompose_errors(p, u)
     assert 0 < r["max_repair_gain"] < 1
     assert abs(r["missing"] + r["fragment"] - r["break_frac"]) < 1e-12
 
 
 def test_tolerance_sweep_flags_an_unstable_conclusion():
-    g, u = scene(); p = g.copy(); p[30, 73:] = False     # tip-only error
+    g, u = scene()  # tip-only error
+    p = g.copy()
+    p[30, 73:] = False
     assert tolerance_sweep(p, u)["stable"] is False
 
 
 def test_tolerance_sweep_calls_a_robust_case_stable():
-    g, u = scene(); p = g.copy(); p[30, 20] = False      # interior gap only
+    g, u = scene()  # interior gap only
+    p = g.copy()
+    p[30, 20] = False
     assert tolerance_sweep(p, u)["stable"] is True
 
 
 def test_random_baseline_flags_a_repair_that_is_no_better_than_random():
     g, u = scene()
-    p = g.copy(); p[30, 20] = False; p[30, 55] = False
+    p = g.copy()
+    p[30, 20] = False
+    p[30, 55] = False
     # "repair" that adds a large blob of voxels connecting nothing meaningful
-    bad = p.copy(); bad[5:15, 60:70] = True
+    bad = p.copy()
+    bad[5:15, 60:70] = True
     out = random_repair_baseline(p, bad, u, n_repeats=5)
     assert out["voxels_added"] > 0
     assert out["beats_random"] is False
 
 
 def test_annotation_floor_is_direction_dependent():
-    a = np.zeros((40, 60), bool); a[20, 5:55] = True
-    b = a.copy(); b[10, 5:55] = True                     # b annotates one more branch
+    a = np.zeros((40, 60), bool)
+    a[20, 5:55] = True
+    b = a.copy()  # b annotates one more branch
+    b[10, 5:55] = True
     fl = annotation_floor(a, b)
     assert fl["a_as_reference"]["break_frac"] == 0.0     # b covers everything a drew
     assert fl["b_as_reference"]["break_frac"] > 0.0      # a misses b's extra branch
@@ -67,3 +89,29 @@ def test_prevalence_check_rejects_bad_input():
         prevalence_check(np.ones(10, bool), np.arange(10), 0.1)
     with pytest.raises(ValueError):
         prevalence_check(np.r_[np.ones(5), np.zeros(5)].astype(bool), np.arange(10), 1.5)
+
+
+def test_random_baseline_reports_both_axes_when_given_ground_truth():
+    g, u = scene()
+    p = g.copy()
+    p[30, 20] = False
+    repaired = p.copy()
+    repaired[30, 20] = True                              # the correct repair
+    out = random_repair_baseline(p, repaired, u, gt=g, n_repeats=4)
+    assert "merge_method" in out and "beats_random_at_matched_merge" in out
+    assert out["merge_method"] == 0.0 or np.isnan(out["merge_method"])
+
+
+def test_random_baseline_without_ground_truth_omits_the_merge_axis():
+    g, u = scene()
+    p = g.copy()
+    p[30, 20] = False
+    out = random_repair_baseline(p, p.copy(), u, n_repeats=2)
+    assert "merge_method" not in out
+
+
+def test_random_baseline_handles_a_prediction_with_one_component():
+    g, u = scene()
+    out = random_repair_baseline(g, g.copy(), u, gt=g, n_repeats=3)
+    assert out["voxels_added"] == 0
+    assert out["break_random_mean"] == out["break_before"]

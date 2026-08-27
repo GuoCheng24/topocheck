@@ -1,7 +1,8 @@
 """The synthetic demonstration must keep demonstrating the thing it claims.
 
 If a change makes the random strategy stop winning on break rate, either the
-package is broken or the argument in the README has changed; both need to be
+package is broken or the argument in the README has changed
+both need to be
 noticed.
 """
 import sys
