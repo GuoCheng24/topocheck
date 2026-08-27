@@ -38,6 +38,9 @@ Strategies compared, all at unlimited link cost:
 | **random assignment** | **25.9%** | 18x |
 | connect all to largest component | 27.4% | 20x |
 
+Random therefore lands **1.5 points** behind the crude connect-to-largest rule
+(25.87% against 27.36% before rounding) and ahead of every learned strategy.
+
 The learned selector was trained on three external centres (ISLES, Lausanne, IXI)
 and applied to the held-out 50, so it never saw the test cases. The false merge
 column is the fraction of ground-truth component pairs fused, relative to the
@@ -49,7 +52,8 @@ ground-truth components above 50 voxels.
 Fragmented share of all connectivity errors at the strict criterion, baseline
 U-Net. HRF: 1.8-3.3% across four training objectives (Dice+CE, unit-level mean,
 unit-level CVaR, Skeleton Recall). TopCoW: 20.7-28.0% across the same four.
-The figure quotes the Dice+CE baseline in each case.
+The figure quotes the Dice+CE baseline in each case: 3.3% against 27.7%, a ratio
+of **8.4**.
 
 ### "an oracle repair captured 27.36% against a predicted budget of 27.4%"
 
@@ -64,7 +68,8 @@ exceeded its budget.
 Undetected share of connectivity errors as the endpoint tolerance goes from 0 to
 2 voxels, baseline U-Net. HRF stays within 93.8-98.2% over tolerances 0-3 on two
 training objectives. TopCoW: 72.3, 63.3, 48.2, 41.6 at tolerances 0, 1, 2, 3,
-with the break rate falling from 0.146 to 0.095.
+with the break rate falling from 0.146 to 0.095, a relative reduction of
+**34.6%** (0.1457 to 0.0953 before rounding).
 
 ### "0.204 in one direction and 0.564 in the other"
 

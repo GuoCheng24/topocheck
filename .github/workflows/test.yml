@@ -1,4 +1,4 @@
-name: CI
+name: test
 on: [push, pull_request]
 jobs:
   test:
@@ -18,3 +18,16 @@ jobs:
         run: pytest -q --cov=topocheck --cov-report=term-missing --cov-fail-under=95
       - name: figure regenerates
         run: python examples/make_hero_figure.py && python examples/why_random_wins.py
+
+  claims:
+    name: README claims
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip && pip install -e ".[dev]" pytest-cov
+      # only the claims this repository can re-derive on any machine; the rest
+      # are checked against docs/EVIDENCE.md by running check_claims.py locally
+      - run: python check_claims.py --runtime

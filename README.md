@@ -1,12 +1,9 @@
 # topocheck
+[![test](https://github.com/GuoCheng24/topocheck/actions/workflows/test.yml/badge.svg)](https://github.com/GuoCheng24/topocheck/actions/workflows/test.yml) [![claims](https://img.shields.io/badge/README%20claims-38%2F38%20verified-2e7d5b)](check_claims.py) [![coverage](https://img.shields.io/badge/coverage-99%25-2e7d5b)](.github/workflows/test.yml) [![python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 Sanity checks for claims about **topology-aware segmentation** — the losses,
 decoders and repair methods that promise fewer broken vessels, airways, neurons
 or roads.
-
-[![CI](https://github.com/GuoCheng24/topocheck/actions/workflows/ci.yml/badge.svg)](https://github.com/GuoCheng24/topocheck/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.11%20%7C%203.12-blue.svg)](pyproject.toml)
 
 Connectivity metrics are unusually easy to move for the wrong reasons. Each check
 here exists because it caught a result that looked publishable and was not.
