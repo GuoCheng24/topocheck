@@ -4,6 +4,10 @@ Sanity checks for claims about **topology-aware segmentation** — the losses,
 decoders and repair methods that promise fewer broken vessels, airways, neurons
 or roads.
 
+[![CI](https://github.com/GuoCheng24/topocheck/actions/workflows/ci.yml/badge.svg)](https://github.com/GuoCheng24/topocheck/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.11%20%7C%203.12-blue.svg)](pyproject.toml)
+
 Connectivity metrics are unusually easy to move for the wrong reasons. Each check
 here exists because it caught a result that looked publishable and was not.
 
@@ -22,19 +26,47 @@ third (72.3% to 48.2%) — the same measurement telling two different stories.
 the second human annotator lands, inside the gap between the two humans.
 Regenerate with `python examples/make_hero_figure.py`.
 
+## Install
+
 ```bash
-pip install topocheck
+pip install git+https://github.com/GuoCheng24/topocheck
 ```
+
+Requires numpy, scipy and scikit-image. Not yet on PyPI.
+
+## Thirty seconds
+
+```bash
+python examples/quickstart.py
+```
+
+builds a synthetic vessel tree, breaks it in two different ways, applies a
+deliberately useless "repair", and asks the checks whether to believe it:
+
+```
+ground truth decomposes into 7 branches
+
+[1] how much of the error is repairable at all
+    break 0.286 = missing 0.143 + fragmented 0.143
+    a repair method can remove at most 50% of the breaks
+
+[2] does a proposed repair beat a random one of the same size
+    added 36 voxels
+    break: 0.286 -> 0.286 (random of equal size: 0.143)
+    beats random: False
+```
+
+In your own code:
 
 ```python
 import topocheck as tc
 
-units = tc.build_units(gt)                    # GT branch decomposition, 2-D or 3-D
-tc.decompose_errors(pred, units)              # how much of the error is even repairable?
-tc.random_repair_baseline(pred, repaired, units)   # does your repair beat a random one?
-tc.tolerance_sweep(pred, units)               # does the conclusion survive the conventions?
-tc.annotation_floor(gt_observer1, gt_observer2)    # is the gain inside human disagreement?
-tc.prevalence_check(y, scores, prevalence=1e-3)    # does a balanced AUC survive deployment?
+units = tc.build_units(gt)                          # GT branch decomposition, 2-D or 3-D
+tc.decompose_errors(pred, units)                    # how much of the error is even repairable?
+tc.random_repair_baseline(pred, repaired, units)    # does your repair beat a random one?
+tc.tolerance_sweep(pred, units)                     # does the conclusion survive the conventions?
+tc.annotation_floor(gt_observer1, gt_observer2)     # is the gain inside human disagreement?
+tc.prevalence_check(y, scores, prevalence=1e-3)     # does a balanced AUC survive deployment?
 ```
 
 ## The five checks, and why each one exists
@@ -116,25 +148,81 @@ This check turns an AUC into the precision, and the false-positives-per-true,
 that you would actually operate at. A zero false-positive count in a finite
 sample is reported as a rule-of-three bound rather than a precision of 1.0.
 
-## Scope and limitations
+## What this does not claim
 
-* Units are **open branches** of the GT skeleton: junctions are removed and only
-  pieces with exactly two endpoints are kept. Under full connectivity, removing a
-  junction also removes its immediate neighbours, so very short stubs do not
-  survive; this is pinned by a test.
-* Full connectivity (8-neighbour in 2-D, 26 in 3-D) is used throughout for the
-  foreground, which avoids the foreground/background connectivity paradox for
+* It does **not** say topology-aware losses do not work. Several of them clearly
+  do; the point is that the size of the effect is easy to overstate and these are
+  the specific ways it happens.
+* It does **not** provide a better repair method. It provides the floor and the
+  ceiling that one would have to beat.
+* The checks are domain-agnostic; **the numbers are not**. Every figure quoted
+  above comes from public datasets, with a plain U-Net and standard
+  topology-aware losses: **HRF** (2-D retinal fundus, 45 images), **STARE** (2-D
+  retinal fundus, 20 images, two annotators), **TopCoW** (3-D cerebrovascular,
+  50 held-out cases plus external centres from ISLES, Lausanne and IXI) and
+  **MSD Task08 Hepatic Vessel** (3-D). No private or patient-identifiable data is
+  involved.
+
+## Implementation notes
+
+* Units are **open branches** of the ground-truth skeleton: junctions are removed
+  and only pieces with exactly two endpoints are kept. Under full connectivity,
+  removing a junction also removes its immediate neighbours, so very short stubs
+  do not survive; this is pinned by a test.
+* Full connectivity (8-neighbour in 2-D, 26 in 3-D) is used for the foreground
+  throughout, which avoids the foreground/background connectivity paradox for
   thin structures.
-* `random_repair_baseline` matches the *number of voxels added*, which is a
-  proxy for "amount of intervention". It is deliberately crude: its purpose is to
-  establish a floor, not to be a competitive method.
-* The checks are domain-agnostic; the numbers are not. Every figure quoted above
-  comes from public datasets, with a plain U-Net and standard topology-aware
-  losses (clDice, Skeleton Recall, supervoxel loss, tubular loss):
-  **HRF** (2-D retinal fundus, 45 images), **STARE** (2-D retinal fundus, 20
-  images, two annotators), **TopCoW** (3-D cerebrovascular, held-out 50 plus
-  external centres from ISLES, Lausanne and IXI) and **MSD Task08 Hepatic
-  Vessel** (3-D). No private or patient-identifiable data is involved.
+* `random_repair_baseline` matches the *number of voxels added*, a deliberately
+  crude proxy for "amount of intervention". Its purpose is to establish a floor,
+  not to compete.
+* A zero false-positive count in a finite sample is reported as a rule-of-three
+  bound rather than a precision of 1.0.
+
+## Related work
+
+The methods these checks are aimed at:
+
+* Shit et al., *clDice: a novel topology-preserving loss function for tubular
+  structure segmentation* ([arXiv:2003.07311](https://arxiv.org/abs/2003.07311))
+* Kirchhoff et al., *Skeleton Recall Loss for connectivity conserving and
+  resource efficient segmentation of thin tubular structures*
+  ([arXiv:2404.03010](https://arxiv.org/abs/2404.03010))
+* *Efficient connectivity-preserving instance segmentation with a supervoxel-based
+  loss function* ([arXiv:2501.01022](https://arxiv.org/abs/2501.01022))
+* Stucki et al., *Topograph: an efficient graph-based framework for strictly
+  topology preserving image segmentation*
+  ([arXiv:2411.03228](https://arxiv.org/abs/2411.03228))
+
+The closest work in spirit, and complementary to this one — it examines how the
+metrics are computed (connectivity choice, ground-truth artefacts, metric
+aggregation), where these checks examine what a reported improvement can be
+attributed to:
+
+* Berger, Lux, Weers, Menten, Rueckert and Paetzold, *Pitfalls of topology-aware
+  image segmentation*, IPMI 2025
+  ([arXiv:2412.14619](https://arxiv.org/abs/2412.14619))
+
+## Where help is wanted
+
+Concrete and in order of usefulness:
+
+1. **A counterexample.** A domain where the repairable share is large *and* a
+   repair method beats the random baseline at matched false-merge cost. We did
+   not find one across 2-D retina, 3-D cerebrovascular and 3-D hepatic vessels,
+   and we would rather be shown wrong than keep saying so.
+2. **More annotation floors.** Any dataset with two or more independent
+   annotations of the same images. The floor is cheap to measure and almost never
+   reported, and it decides whether a benchmark has room left.
+3. **The decomposition for other structural metrics.** The missing/fragmented
+   split is defined here for endpoint connectivity; the same argument should
+   apply to Betti-number error, variation of information, and split/merge counts,
+   but the bookkeeping differs.
+
+Contribution guidelines and what qualifies as a check: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Citing
+
+See [CITATION.cff](CITATION.cff).
 
 ## License
 

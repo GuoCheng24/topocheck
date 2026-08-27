@@ -19,8 +19,12 @@ classifiers = [
 ]
 dependencies = ["numpy>=1.21", "scipy>=1.7", "scikit-image>=0.19"]
 
+[project.optional-dependencies]
+dev = ["pytest>=7", "matplotlib>=3.5", "pillow>=9"]
+
 [project.urls]
 Homepage = "https://github.com/GuoCheng24/topocheck"
+Issues = "https://github.com/GuoCheng24/topocheck/issues"
 
 [tool.setuptools.packages.find]
 include = ["topocheck*"]

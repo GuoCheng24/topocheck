@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: "topocheck: sanity checks for topology-aware segmentation claims"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Cheng
+    given-names: Guo
+    orcid: "https://orcid.org/0009-0006-7813-0114"
+repository-code: "https://github.com/GuoCheng24/topocheck"
+license: MIT
+version: 0.1.0
+keywords:
+  - image segmentation
+  - topology
+  - evaluation
+  - medical imaging
+  - connectivity
