@@ -7,6 +7,21 @@ or roads.
 Connectivity metrics are unusually easy to move for the wrong reasons. Each check
 here exists because it caught a result that looked publishable and was not.
 
+![What the checks catch](docs/hero.png)
+
+*(a)* On TopCoW, a **random** assignment of fragments reduced the break rate by
+25.9% — ahead of every learned repair we built, and 1.5 points behind simply
+connecting everything to the largest component. All of them multiply false merges
+by 10-20x, which is the only reason they are distinguishable at all.
+*(b)* The fragmented share of the errors is a hard ceiling on any repair method:
+3.3% on HRF against 27.7% on TopCoW, an 8.4-fold difference in how much a decoder
+could possibly buy. *(c)* Allowing endpoints to match within 2 voxels leaves HRF's
+undetected share essentially unchanged (96.7% to 94.6%) and cuts TopCoW's by a
+third (72.3% to 48.2%) — the same measurement telling two different stories.
+*(d)* A U-Net cross-validated against one STARE annotator lands 0.008 from where
+the second human annotator lands, inside the gap between the two humans.
+Regenerate with `python examples/make_hero_figure.py`.
+
 ```bash
 pip install topocheck
 ```
