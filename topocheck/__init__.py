@@ -10,7 +10,7 @@ was not:
 - :func:`prevalence_check`       — does a balanced-sample AUC survive the real class ratio?
 """
 from .units import Unit, build_units, full_structure
-from .metrics import break_rate, label_with_tolerance
+from .metrics import break_rate, false_merge_rate, label_with_tolerance
 from .checks import (
     random_repair_baseline,
     decompose_errors,
@@ -22,7 +22,7 @@ from .checks import (
 __version__ = "0.1.0"
 __all__ = [
     "Unit", "build_units", "full_structure",
-    "break_rate", "label_with_tolerance",
+    "break_rate", "false_merge_rate", "label_with_tolerance",
     "random_repair_baseline", "decompose_errors", "tolerance_sweep",
     "annotation_floor", "prevalence_check",
 ]

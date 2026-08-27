@@ -8,7 +8,7 @@ from __future__ import annotations
 import numpy as np
 from scipy import ndimage
 
-from .metrics import break_rate
+from .metrics import break_rate, false_merge_rate
 from .units import full_structure
 
 __all__ = [
@@ -46,13 +46,18 @@ def _random_repair(pred, n_voxels, rng):
     return out
 
 
-def random_repair_baseline(pred, repaired, units, n_repeats: int = 20, seed: int = 0,
-                           tolerance: int = 0) -> dict:
+def random_repair_baseline(pred, repaired, units, gt=None, n_repeats: int = 20,
+                           seed: int = 0, tolerance: int = 0, min_size: int = 50) -> dict:
     """What does a *random* repair of the same size achieve?
 
     Connectivity metrics reward adding voxels: linking anything to anything makes
     endpoints co-connected.  A method that does not clearly beat a random repair
     of equal size has not been shown to repair anything.
+
+    Pass ``gt`` to get the second axis.  Break rate on its own can always be
+    improved by connecting more, so the comparison that means anything is
+    *break at matched false-merge cost*; without ``gt`` this function can only
+    report half of it.
 
     Parameters
     ----------
@@ -60,22 +65,27 @@ def random_repair_baseline(pred, repaired, units, n_repeats: int = 20, seed: int
         Prediction before and after your repair / post-processing.
     units : list of Unit
         From :func:`topocheck.units.build_units` on the ground truth.
+    gt : bool array, optional
+        Ground truth, used to measure false merges alongside break rate.
 
     Returns
     -------
-    dict with the method's break rate, the random baseline's mean/std break rate
-    over ``n_repeats`` draws, the number of voxels added, and ``beats_random``.
+    dict
+        Break rate before / for the method / for the random baseline (mean and
+        std over ``n_repeats`` draws), the number of voxels added, and
+        ``beats_random``.  When ``gt`` is given, also the corresponding false
+        merge rates and ``beats_random_at_matched_merge``, which requires the
+        method to reduce breaks further than random *without* merging more.
     """
     pred = np.asarray(pred).astype(bool)
     repaired = np.asarray(repaired).astype(bool)
     n_added = int((repaired & ~pred).sum())
     rng = np.random.default_rng(seed)
+    randoms = [_random_repair(pred, n_added, rng) for _ in range(n_repeats)]
     base = break_rate(pred, units, tolerance)["break_frac"]
     method = break_rate(repaired, units, tolerance)["break_frac"]
-    draws = [break_rate(_random_repair(pred, n_added, rng), units, tolerance)["break_frac"]
-             for _ in range(n_repeats)]
-    draws = np.asarray(draws, float)
-    return dict(
+    draws = np.asarray([break_rate(r, units, tolerance)["break_frac"] for r in randoms], float)
+    out = dict(
         voxels_added=n_added,
         break_before=base,
         break_method=method,
@@ -83,6 +93,22 @@ def random_repair_baseline(pred, repaired, units, n_repeats: int = 20, seed: int
         break_random_std=float(draws.std()),
         beats_random=bool(method < draws.mean()),
     )
+    if gt is not None:
+        m_before = false_merge_rate(pred, gt, min_size)["false_merge_rate"]
+        m_method = false_merge_rate(repaired, gt, min_size)["false_merge_rate"]
+        m_draws = np.asarray([false_merge_rate(r, gt, min_size)["false_merge_rate"]
+                              for r in randoms], float)
+        m_rand = float(np.nanmean(m_draws)) if not np.all(np.isnan(m_draws)) else float("nan")
+        out.update(
+            merge_before=m_before,
+            merge_method=m_method,
+            merge_random_mean=m_rand,
+            beats_random_at_matched_merge=bool(
+                method < draws.mean()
+                and not (m_method > m_rand)          # NaN-safe: unknown does not pass
+            ),
+        )
+    return out
 
 
 # --------------------------------------------------------------------------- #

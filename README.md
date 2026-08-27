@@ -148,6 +148,24 @@ This check turns an AUC into the precision, and the false-positives-per-true,
 that you would actually operate at. A zero false-positive count in a finite
 sample is reported as a rule-of-three bound rather than a precision of 1.0.
 
+## Reproducing the phenomenon
+
+The headline observation — a random repair scoring well — is not a property of
+those datasets. `examples/why_random_wins.py` builds synthetic vasculature,
+fragments it, and repairs it three ways: at random, by nearest component, and by
+the true partner. It takes about a minute and downloads nothing.
+
+![Both axes at once](docs/random_baseline.png)
+
+Across fragmentation levels, the strategy that scores **best** on break rate is
+the random one, because fusing everything makes every pair of endpoints
+co-connected. It is only on the second axis that it is revealed as a collapse
+rather than a repair. This is why `random_repair_baseline` reports both when you
+pass it the ground truth.
+
+For how each number quoted above was produced, and what cannot be checked from
+this repository, see [docs/EVIDENCE.md](docs/EVIDENCE.md).
+
 ## What this does not claim
 
 * It does **not** say topology-aware losses do not work. Several of them clearly

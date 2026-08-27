@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from topocheck import build_units, break_rate, label_with_tolerance
 
 def line():
@@ -46,3 +47,37 @@ def test_label_with_tolerance_keeps_component_identity():
     g = np.zeros((20, 20), bool); g[5, 2:8] = True; g[5, 12:18] = True
     lab = label_with_tolerance(g, tolerance=1)
     assert lab[5, 1] == lab[5, 2] and lab[5, 2] != lab[5, 12]
+
+
+def test_false_merge_rate_is_zero_when_nothing_is_fused():
+    from topocheck import false_merge_rate
+    gt = np.zeros((60, 80), bool); gt[20, 5:75] = True; gt[40, 5:75] = True
+    r = false_merge_rate(gt, gt, min_size=20)
+    assert r["false_merge_rate"] == 0.0 and r["n_components"] == 2
+
+
+def test_false_merge_rate_catches_a_fused_pair():
+    from topocheck import false_merge_rate
+    gt = np.zeros((60, 80), bool); gt[20, 5:75] = True; gt[40, 5:75] = True
+    fused = gt.copy(); fused[20:41, 40] = True
+    assert false_merge_rate(fused, gt, min_size=20)["false_merge_rate"] == 1.0
+
+
+def test_false_merge_rate_is_nan_when_nothing_could_be_fused():
+    from topocheck import false_merge_rate
+    gt = np.zeros((60, 80), bool); gt[20, 5:75] = True
+    r = false_merge_rate(gt, gt, min_size=20)
+    assert np.isnan(r["false_merge_rate"]) and r["n_pairs"] == 0
+
+
+def test_false_merge_rate_ignores_annotation_speckle():
+    from topocheck import false_merge_rate
+    gt = np.zeros((60, 80), bool); gt[20, 5:75] = True; gt[40, 5:75] = True
+    gt[5, 5] = True                                  # one-pixel speck
+    assert false_merge_rate(gt, gt, min_size=20)["n_components"] == 2
+
+
+def test_false_merge_rate_rejects_shape_mismatch():
+    from topocheck import false_merge_rate
+    with pytest.raises(ValueError):
+        false_merge_rate(np.zeros((4, 4), bool), np.zeros((5, 5), bool))
