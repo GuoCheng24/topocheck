@@ -40,7 +40,11 @@ def test_font_size_survives_the_render_width():
 
 
 def test_figure_script_is_self_contained():
+    """No absolute paths and no reads from disk: the figure must be regenerable
+    by anyone who clones the repository, from values written in the script."""
     src = SCRIPT.read_text()
-    assert "matplotlib.use(\"Agg\")" in src, "must render headless"
-    for token in ("/public/", "chengguo", "results/"):
-        assert token not in src, f"figure script must not reference private paths ({token})"
+    assert 'matplotlib.use("Agg")' in src, "must render headless"
+    abs_paths = re.findall(r"""["'](/[A-Za-z0-9_./-]+)["']""", src)
+    assert not abs_paths, f"figure script must not contain absolute paths: {abs_paths}"
+    for token in ("open(", "np.load", "json.load", "read_csv"):
+        assert token not in src, f"figure script must not read from disk ({token})"
