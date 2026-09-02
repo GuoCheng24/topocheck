@@ -5,3 +5,9 @@ build/
 dist/
 .pytest_cache/
 .venv/
+
+# coverage artefacts (a committed .coverage leaked absolute build paths once)
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
