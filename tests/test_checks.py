@@ -115,3 +115,21 @@ def test_random_baseline_handles_a_prediction_with_one_component():
     out = random_repair_baseline(g, g.copy(), u, gt=g, n_repeats=3)
     assert out["voxels_added"] == 0
     assert out["break_random_mean"] == out["break_before"]
+
+
+def test_version_matches_the_packaging_metadata():
+    """The version lives in two files; a release that updates only one ships a
+    package whose metadata and __version__ disagree, which is what happened
+    between 0.1.0 and 0.1.1."""
+    import re
+    import pathlib
+
+    import topocheck
+
+    root = pathlib.Path(__file__).resolve().parents[1]
+    declared = re.search(r'^version = "([^"]+)"',
+                         (root / "pyproject.toml").read_text(), re.M)
+    assert declared, "pyproject.toml no longer declares a version"
+    assert topocheck.__version__ == declared.group(1), (
+        f"topocheck.__version__ is {topocheck.__version__} but pyproject.toml "
+        f"says {declared.group(1)}")

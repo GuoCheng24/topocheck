@@ -1,5 +1,6 @@
 # topocheck
-[![test](https://github.com/GuoCheng24/topocheck/actions/workflows/test.yml/badge.svg)](https://github.com/GuoCheng24/topocheck/actions/workflows/test.yml) [![claims](https://img.shields.io/badge/README%20claims-38%2F38%20verified-2e7d5b)](check_claims.py) [![coverage](https://img.shields.io/badge/coverage-99%25-2e7d5b)](.github/workflows/test.yml) [![python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/topocheck)](https://pypi.org/project/topocheck/)
+[![test](https://github.com/GuoCheng24/topocheck/actions/workflows/test.yml/badge.svg)](https://github.com/GuoCheng24/topocheck/actions/workflows/test.yml) [![claims](https://img.shields.io/badge/README%20claims-38%2F38%20verified-2e7d5b)](https://github.com/GuoCheng24/topocheck/blob/master/check_claims.py) [![coverage](https://img.shields.io/badge/coverage-99%25-2e7d5b)](https://github.com/GuoCheng24/topocheck/blob/master/.github/workflows/test.yml) [![python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/) [![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/GuoCheng24/topocheck/blob/master/LICENSE)
 
 Sanity checks for claims about **topology-aware segmentation** — the losses,
 decoders and repair methods that promise fewer broken vessels, airways, neurons
@@ -8,7 +9,7 @@ or roads.
 Connectivity metrics are unusually easy to move for the wrong reasons. Each check
 here exists because it caught a result that looked publishable and was not.
 
-![What the checks catch](docs/hero.png)
+![What the checks catch](https://raw.githubusercontent.com/GuoCheng24/topocheck/master/docs/hero.png)
 
 *(a)* On TopCoW, a **random** assignment of fragments reduced the break rate by
 25.9% — ahead of every learned repair we built, and 1.5 points behind simply
@@ -26,7 +27,7 @@ Regenerate with `python examples/make_hero_figure.py`.
 ## Install
 
 ```bash
-pip install git+https://github.com/GuoCheng24/topocheck
+pip install topocheck
 ```
 
 Requires numpy, scipy and scikit-image. Not yet on PyPI.
@@ -79,6 +80,9 @@ tc.prevalence_check(y, scores, prevalence=1e-3)     # does a balanced AUC surviv
 | **just inherited a segmentation pipeline** | a decomposition of where its connectivity errors actually come from, which is usually not where people assume |
 
 ## Which check applies to what
+
+<!-- PyPI renders this as code; it is a diagram on GitHub -->
+*(renders as a diagram on GitHub; the same decision tree in words follows below)*
 
 ```mermaid
 flowchart TD
@@ -193,7 +197,7 @@ those datasets. `examples/why_random_wins.py` builds synthetic vasculature,
 fragments it, and repairs it three ways: at random, by nearest component, and by
 the true partner. It takes about a minute and downloads nothing.
 
-![Both axes at once](docs/random_baseline.png)
+![Both axes at once](https://raw.githubusercontent.com/GuoCheng24/topocheck/master/docs/random_baseline.png)
 
 Across fragmentation levels, the strategy that scores **best** on break rate is
 the random one, because fusing everything makes every pair of endpoints
@@ -202,7 +206,7 @@ rather than a repair. This is why `random_repair_baseline` reports both when you
 pass it the ground truth.
 
 For how each number quoted above was produced, and what cannot be checked from
-this repository, see [docs/EVIDENCE.md](docs/EVIDENCE.md).
+this repository, see [docs/EVIDENCE.md](https://github.com/GuoCheng24/topocheck/blob/master/docs/EVIDENCE.md).
 
 ## What this does not claim
 
@@ -274,11 +278,11 @@ Concrete and in order of usefulness:
    apply to Betti-number error, variation of information, and split/merge counts,
    but the bookkeeping differs.
 
-Contribution guidelines and what qualifies as a check: [CONTRIBUTING.md](CONTRIBUTING.md).
+Contribution guidelines and what qualifies as a check: [CONTRIBUTING.md](https://github.com/GuoCheng24/topocheck/blob/master/CONTRIBUTING.md).
 
 ## Citing
 
-See [CITATION.cff](CITATION.cff).
+See [CITATION.cff](https://github.com/GuoCheng24/topocheck/blob/master/CITATION.cff).
 
 ## License
 

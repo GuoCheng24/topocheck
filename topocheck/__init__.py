@@ -19,7 +19,7 @@ from .checks import (
 from .metrics import break_rate, false_merge_rate, label_with_tolerance
 from .units import Unit, build_units, full_structure
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = [
     "Unit",
     "annotation_floor",
