@@ -121,8 +121,8 @@ def test_version_matches_the_packaging_metadata():
     """The version lives in two files; a release that updates only one ships a
     package whose metadata and __version__ disagree, which is what happened
     between 0.1.0 and 0.1.1."""
-    import re
     import pathlib
+    import re
 
     import topocheck
 
