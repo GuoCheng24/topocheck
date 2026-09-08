@@ -30,7 +30,7 @@ Regenerate with `python examples/make_hero_figure.py`.
 pip install topocheck
 ```
 
-Requires numpy, scipy and scikit-image. Not yet on PyPI.
+Requires numpy, scipy and scikit-image.
 
 Tests cover 99% of the package and CI enforces a 95% floor across Python 3.9,
 3.11 and 3.12, together with linting and a regeneration of both figures.
