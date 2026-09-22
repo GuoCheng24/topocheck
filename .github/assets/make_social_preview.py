@@ -1,27 +1,49 @@
 """Generate the GitHub social-preview card (1200x630). Reproducible: python3 make_social_preview.py
 
-The previous card put its message in a block of 14 pt monospace. A social card is unfurled at about
-360 px wide in Slack, where that is grey noise, so the message is in the headline now and the
-terminal panel is texture beside it. Layout in lightcard.py next to this file.
+The evidence on this card is the strategy table from docs/EVIDENCE.md, which is the finding:
+a random assignment reduces the break rate more than the learned selector does.
 """
 import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from lightcard import draw  # noqa: E402
+from cardkit import SANS, card  # noqa: E402
 
-out = draw(
+# docs/EVIDENCE.md, TopCoW, 50 held-out volumes, strict endpoint criterion
+STRATEGIES = [
+    ("random assignment", 25.9, True),
+    ("learned selector", 20.6, False),
+]
+
+
+def chart(ax, accent):
+    """Two bars, because at 360 px five of them are five grey smudges.
+
+    The finding is one comparison: the random assignment reduces the break rate more than
+    the learned selector does. The other three strategies are in docs/EVIDENCE.md.
+    """
+    x0, span, top, step = 5.55, 3.35, 2.95, 1.32
+    for i, (name, value, hero) in enumerate(STRATEGIES):
+        y = top - i * step
+        ax.barh(y, span * value / 27.4, height=0.66, left=x0,
+                color=accent if hero else "#c7c3bc", zorder=3)
+        ax.text(x0 - 0.22, y, name, fontsize=34,
+                fontweight="bold" if hero else "normal",
+                color="#17181a" if hero else "#55585c",
+                family=SANS, ha="right", va="center")
+        ax.text(x0 + span * value / 27.4 + 0.18, y, f"{value:.1f}%",
+                fontsize=40, fontweight="bold",
+                color="#17181a" if hero else "#55585c", family=SANS, va="center")
+
+
+out = card(
     out=str(pathlib.Path(__file__).parent / "social-preview.png"),
-    accent="#1f6feb", badge="T", headline_size=40,
+    accent="#1f6feb", badge="T",
     kicker="PYTHON PACKAGE  ·  pip install topocheck",
-    headline="A random repair beat every learned one",
-    subline="so the harness says what is repairable",
-    body=["On TopCoW a random fragment", "assignment cut the break rate by", "25.9 percent, ahead of every learned", "repair we built."],
-    panel=[("$ python examples/quickstart.py", "dim"),
-           ("[1] how much of the error is repairable", "ink"),
-           ("    at most 50% of the breaks", "warn"),
-           ("[2] does the repair beat a random one", "ink"),
-           ("    beats random: False", "red")],
+    headline="Random repair beat every learned one",
+    evidence="break rate reduction, TopCoW, 50 held-out volumes",
+    chart=chart,
     footer="github.com/GuoCheng24/topocheck",
+    headline_size=41,
 )
 print(f"written {pathlib.Path(out).name} 1200x630")
