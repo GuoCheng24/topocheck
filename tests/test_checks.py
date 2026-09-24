@@ -133,3 +133,9 @@ def test_version_matches_the_packaging_metadata():
     assert topocheck.__version__ == declared.group(1), (
         f"topocheck.__version__ is {topocheck.__version__} but pyproject.toml "
         f"says {declared.group(1)}")
+    # CITATION.cff is the third place, and the one a DOI archive reads: it still
+    # said 0.1.0 a release later, and nothing here looked at it.
+    cited = re.search(r"^version: (\S+)", (root / "CITATION.cff").read_text(), re.M)
+    assert cited and cited.group(1) == declared.group(1), (
+        f"CITATION.cff says {cited and cited.group(1)} but pyproject.toml "
+        f"says {declared.group(1)}")
