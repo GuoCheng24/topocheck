@@ -284,6 +284,14 @@ Contribution guidelines and what qualifies as a check: [CONTRIBUTING.md](https:/
 
 See [CITATION.cff](https://github.com/GuoCheng24/topocheck/blob/HEAD/CITATION.cff).
 
+## Other things from the same desk
+
+- [groundwork](https://github.com/GuoCheng24/groundwork) — a research pipeline for coding agents whose first stage can return NO-GO; on PyPI as `groundwork-research`
+- [ct-reconstruction-harness](https://github.com/GuoCheng24/ct-reconstruction-harness) — reproduce the LoDoPaB-CT baselines from scratch, then beat a published one with guards that must fail on broken operators
+- [sciglyph](https://github.com/GuoCheng24/sciglyph) — draw publication figures as code, in pure matplotlib
+
+More at [github.com/GuoCheng24](https://github.com/GuoCheng24).
+
 ## License
 
 MIT
